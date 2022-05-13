@@ -1,11 +1,18 @@
 from datetime import datetime, date
+from pathlib import Path
 from os import system
 import requests
 import json
 
 system("cls")
+path = __file__.split("\\")
+path.pop(-1)
+path.append("settings.json")
+path = r"\\".join(path)
+
 #loading settings
-with open("settings.json") as f:
+print(path)
+with Path(path).open("r") as f:
     settings = json.loads(f.read())
 
 #loading and parsing the API json
@@ -51,17 +58,23 @@ jdata = json.loads(requests.get(api_url).text)
 for appid, gamedata in jdata.items():
     title = gamedata["name"]
     if gamedata["is_free_game"]:
-        price = "Free"
+        price = "0"
     else:
         try:
             price = str(int(gamedata["subs"][0]["price"]) / 100)
         except IndexError:
-            price = "Game not released"
+            price = "-1"
     games[title] = price
 
 print("\n--- Steam games ---")
 for title_, price_ in games.items():
-    print(title_.center(20) + price_.center(60))
+    if price_ == "-1":
+        pprice = "Not released yet."
+    elif price_ == "0":
+        pprice = "Free"
+    else:
+        pprice = price_
+    print(title_.center(20) + pprice.center(60))
 
 
 if settings["settings"]["alwaysshow"] == True:
@@ -73,12 +86,10 @@ else:
     elif not settings["games"]["steam"] == games:
         input()
 
-with open("settings.json", "r") as f:
-    data = json.loads(f.read())
 for t in titles:
     if not t in settings["games"]["epicgames"]:
-        data["games"]["epicgames"].append(t)
+        settings["games"]["epicgames"].append(t)
 for title, price in games.items():
-    data["games"]["steam"][title] = price
-with open("settings.json", "w") as f:
-    f.write(json.dumps(data))
+    settings["games"]["steam"][title] = price
+with Path(path).open("w") as f:
+    f.write(json.dumps(settings))

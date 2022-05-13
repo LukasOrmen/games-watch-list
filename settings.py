@@ -1,9 +1,12 @@
+from __future__ import with_statement
 from sys import argv
 from json import loads, dumps
+from os import getcwd, getlogin
+from pathlib import Path
 
 
-if not len(argv) > 2:
-    print("Requires at least 2 arguments: python3 settings.py [argument] [true/false]")
+if not len(argv) > 1:
+    print("Requires at least 1 argument: python3 settings.py [argument] [true/false]")
     exit()
 
 with open("settings.json", "r") as f:
@@ -23,6 +26,14 @@ elif "-alwaysshow" == argv[1]:
     else:
         settings["settings"]["alwaysshow"] = False
         print("Always show is now deactive.")
+elif argv[1] == "-steamid":
+    print(argv[2] + ", is the new steam id linked to your account")
+    if len(argv) > 2 and int(argv[2]):
+        settings["steamid"] = argv[2] 
+elif argv[1] == "-update-path":
+    with Path(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\gameswatchlist.bat").open("w") as f:
+        f.write("python3 " + getcwd() + "\\main.py")
+    settings["path"] = getcwd() + "\\main.py"
 
 with open("settings.json", "w") as f:
     f.write(dumps(settings))
