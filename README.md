@@ -10,4 +10,5 @@
 https://steamcommunity.com/profiles/ **[This is your steam id]**
 # Usage
 `-autostart [true/false]` **To start the program when you log into your account**
+
 `-alwaysshow [true/false]` **To always show when run, even if there is no changes**
