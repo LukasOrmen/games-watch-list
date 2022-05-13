@@ -8,3 +8,4 @@
 https://steamcommunity.com/profiles/**[This is your steam id]**
 # Usage
 `-alwaysshow [true/false]` **To always show when run, even if there is no changes**
+`-alwaysshow [true/false]` **To always show when run, even if there is no changes**
