@@ -11,7 +11,6 @@ path.append("settings.json")
 path = r"\\".join(path)
 
 #loading settings
-print(path)
 with Path(path).open("r") as f:
     settings = json.loads(f.read())
 
@@ -47,34 +46,36 @@ for game in all_games:
         except IndexError:
             pass
 
+if settings["steamid"] == "":
+    print("No steam id connected to account.\nto enter a steam id type: python3 settings.py -steamid [YOUR STEAM ID HERE]")
+else:
+    #STEAM GAMES
+    steamid = settings["steamid"]
+    api_url = f"https://store.steampowered.com/wishlist/profiles/{steamid}/wishlistdata"
 
-#STEAM GAMES
-steamid = settings["steamid"]
-api_url = f"https://store.steampowered.com/wishlist/profiles/{steamid}/wishlistdata"
+    games = {}
 
-games = {}
+    jdata = json.loads(requests.get(api_url).text)
+    for appid, gamedata in jdata.items():
+        title = gamedata["name"]
+        if gamedata["is_free_game"]:
+            price = "0"
+        else:
+            try:
+                price = str(int(gamedata["subs"][0]["price"]) / 100)
+            except IndexError:
+                price = "-1"
+        games[title] = price
 
-jdata = json.loads(requests.get(api_url).text)
-for appid, gamedata in jdata.items():
-    title = gamedata["name"]
-    if gamedata["is_free_game"]:
-        price = "0"
-    else:
-        try:
-            price = str(int(gamedata["subs"][0]["price"]) / 100)
-        except IndexError:
-            price = "-1"
-    games[title] = price
-
-print("\n--- Steam games ---")
-for title_, price_ in games.items():
-    if price_ == "-1":
-        pprice = "Not released yet."
-    elif price_ == "0":
-        pprice = "Free"
-    else:
-        pprice = price_
-    print(title_.center(20) + pprice.center(60))
+    print("\n--- Steam games ---")
+    for title_, price_ in games.items():
+        if price_ == "-1":
+            pprice = "Not released yet."
+        elif price_ == "0":
+            pprice = "Free"
+        else:
+            pprice = price_
+        print(title_.center(20) + pprice.center(60))
 
 
 if settings["settings"]["alwaysshow"] == True:
@@ -83,13 +84,19 @@ else:
     common = str(set(titles) & set(settings["games"]["epicgames"]))
     if common == "set()":
         input()
-    elif not settings["games"]["steam"] == games:
-        input()
+    try:
+        if not settings["games"]["steam"] == games:
+            input()
+    except NameError:
+        pass
 
 for t in titles:
     if not t in settings["games"]["epicgames"]:
         settings["games"]["epicgames"].append(t)
-for title, price in games.items():
-    settings["games"]["steam"][title] = price
+try:
+    for title, price in games.items():
+        settings["games"]["steam"][title] = price
+except NameError:
+    pass
 with Path(path).open("w") as f:
     f.write(json.dumps(settings))

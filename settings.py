@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from sys import argv
 from json import loads, dumps
 from os import getcwd, getlogin
@@ -15,9 +14,13 @@ with open("settings.json", "r") as f:
 if "-autostart" == argv[1]:
     if "true" == argv[2]:
         settings["settings"]["autostart"] = True
+        with Path(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\gameswatchlist.bat").open("w") as f:
+            f.write("python3 " + settings["path"])
         print("Autostart is now active.")
     else:
         settings["settings"]["autostart"] = False
+        with Path(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\gameswatchlist.bat").open("w") as f:
+            f.write("")
         print("Autostart is now deactive.")
 elif "-alwaysshow" == argv[1]:
     if "true" == argv[2]:
@@ -31,8 +34,6 @@ elif argv[1] == "-steamid":
     if len(argv) > 2 and int(argv[2]):
         settings["steamid"] = argv[2] 
 elif argv[1] == "-update-path":
-    with Path(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\gameswatchlist.bat").open("w") as f:
-        f.write("python3 " + getcwd() + "\\main.py")
     settings["path"] = getcwd() + "\\main.py"
 
 with open("settings.json", "w") as f:
