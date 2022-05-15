@@ -1,4 +1,15 @@
 # Install and setup
+
+**To get started clone this repo**
+
+`git clone git@github.com:LukasOrmen/games-watch-list.git`
+
+
+
+
+
+
+
 **Install dependencies**
 
 `pip3 install -r requirements.txt`
